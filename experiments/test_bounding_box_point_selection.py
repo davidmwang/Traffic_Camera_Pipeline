@@ -35,6 +35,12 @@ print(init_labels[1])
 cnfg = Config()
 hm = Homography(cnfg)
 
+def choose_point_simple(bbox):
+    x_min, y_min, x_max, y_max = bbox
+    result = hm.transform_point((x_min + x_max) / 2.0, y_max * 3.0 / 4 + y_min * 1.0 / 4, 
+                                use_offset=False)
+    return result
+
 # test_bboxes = bboxes[0]
 # points = []
 # for i in range(len(test_bboxes)):
@@ -55,7 +61,7 @@ hm = Homography(cnfg)
 
 # plt.show()
 
-fig, axarr = plt.subplots(2)
+fig, axarr = plt.subplots(2, figsize=(5,10))
 
 img = plt.imread(os.path.join(VIDEO_NAME + "_images", '%s_%07d.jpg' % (VIDEO_NAME, 0)))
 img_plot = axarr[0].imshow(img)
@@ -76,25 +82,19 @@ axes.plot([0, 1000], [600, 600], color='k')
 test_bboxes = bboxes[0]
 points = []
 for j in range(len(test_bboxes)):
-    x_min, y_min, x_max, y_max = test_bboxes[j]
-    result = hm.transform_point((x_min + x_max) / 2.0, y_max * 3.0 / 4 + y_min * 1.0 / 4, use_offset=False)
-    points.append(result)
+    points.append(choose_point_simple(test_bboxes[j]))
 
 points = np.array(points)
 scatter_plot = axes.scatter(points[:,0], points[:,1])
 
 def animate(i):
-    print("Frame", i)
-
     img = plt.imread(os.path.join(VIDEO_NAME + "_images", '%s_%07d.jpg' % (VIDEO_NAME, i)))
     img_plot.set_data(img)
 
     test_bboxes = bboxes[i]
     points = []
     for j in range(len(test_bboxes)):
-        x_min, y_min, x_max, y_max = test_bboxes[j]
-        result = hm.transform_point((x_min + x_max) / 2.0, y_max * 3.0 / 4 + y_min * 1.0 / 4, use_offset=False)
-        points.append(result)
+        points.append(choose_point_simple(test_bboxes[j]))
 
     points = np.array(points)
     scatter_plot.set_offsets(points)
