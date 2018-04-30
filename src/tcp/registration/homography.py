@@ -153,6 +153,16 @@ class Homography():
 
         return tf_traj
 
+    def transform_point(self, x, y, use_offset=False):
+        x *= self.config.img_dim[0]
+        y *= self.config.img_dim[1]
+
+        img_point = np.array([x, y])
+
+        if use_offset:
+            img_point = self.af.add_offset(img_point)
+
+        return self.tf_mat.inverse(img_point)[0]
 
 
 ##########TEST CASES FOR HOMOGRAPHY CLASS 
